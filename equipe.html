@@ -14,14 +14,15 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7f9;
+      background: #f4f7f9 url('https://images.unsplash.com/photo-1592924357228-91c2c76ac7c4?auto=format&fit=crop&w=1400&q=80') no-repeat center center fixed;
+      background-size: cover;
       color: #333;
       line-height: 1.6;
       scroll-behavior: smooth;
     }
 
     header {
-      background: linear-gradient(135deg, #2e9f6e, #58c79d);
+      background: rgba(46, 159, 110, 0.9);
       color: #fff;
       padding: 40px 20px 20px 20px;
       text-align: center;
@@ -29,13 +30,13 @@
     }
 
     header h1 {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       letter-spacing: 1px;
       margin-bottom: 10px;
     }
 
     header p {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
     nav {
@@ -43,18 +44,19 @@
       justify-content: center;
       background: #2e9f6e;
       padding: 12px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
     }
 
     nav a {
       color: #fff;
       text-decoration: none;
-      margin: 0 15px;
+      margin: 5px 15px;
       font-weight: bold;
       transition: color 0.3s;
+      font-size: 1rem;
     }
 
     nav a:hover {
@@ -65,7 +67,8 @@
       text-align: center;
       margin: 40px 0 20px;
       color: #2e9f6e;
-      font-size: 2rem;
+      font-size: 1.8rem;
+      text-shadow: 1px 1px #dff5ea;
     }
 
     .equipe {
@@ -73,11 +76,11 @@
       justify-content: center;
       flex-wrap: wrap;
       gap: 25px;
-      padding: 0 20px;
+      padding: 0 20px 40px;
     }
 
     .membro, .orientadora {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.95);
       padding: 20px;
       border-radius: 12px;
       width: 220px;
@@ -87,13 +90,17 @@
       opacity: 0;
       transform: translateY(30px);
       animation: fadeUp 0.8s forwards;
+      position: relative;
+      overflow: hidden;
     }
 
+    /* EFEITO AO PASSAR O MOUSE NA CAIXA */
     .membro:hover, .orientadora:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     }
 
+    /* IMAGEM E EFEITO AO PASSAR O MOUSE */
     .membro img, .orientadora img {
       width: 120px;
       height: 120px;
@@ -101,37 +108,27 @@
       object-fit: cover;
       margin-bottom: 15px;
       border: 3px solid #2e9f6e;
-      position: relative;
-      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s;
     }
 
-    /* Tooltip */
-    .membro img:hover::after, .orientadora img:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 140%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #2e9f6e;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      z-index: 10;
-      opacity: 1;
+    .membro img:hover, .orientadora img:hover {
+      transform: scale(1.1);
+      border-color: #4ef3a1;
+      box-shadow: 0 0 12px #4ef3a1;
     }
 
-    .membro img::after, .orientadora img::after {
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
+    /* ANIMAÇÃO DE ENTRADA */
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .membro h3, .orientadora h3 {
       color: #2e9f6e;
       margin-bottom: 10px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
     }
 
     .membro p, .orientadora p {
@@ -150,18 +147,19 @@
     .contatos a {
       color: #2e9f6e;
       font-size: 1.2rem;
-      transition: color 0.3s;
+      transition: color 0.3s, transform 0.3s;
     }
 
     .contatos a:hover {
       color: #238754;
+      transform: scale(1.2);
     }
 
     form {
       width: 90%;
       max-width: 400px;
       margin: 50px auto;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.95);
       padding: 25px;
       border-radius: 12px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
@@ -198,23 +196,37 @@
       background: #238754;
     }
 
-    @keyframes fadeUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      nav a {
+        font-size: 0.95rem;
+        margin: 5px 10px;
+      }
+
       .equipe {
         flex-direction: column;
         align-items: center;
       }
 
-      nav {
-        flex-direction: column;
-        gap: 10px;
+      .membro, .orientadora {
+        width: 90%;
       }
+
+      form {
+        width: 95%;
+      }
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: rgba(46, 159, 110, 0.9);
+      color: white;
+      margin-top: 40px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -238,12 +250,11 @@
       <div class="contatos">
         <a href="mailto:deboratinel8@gmail.com"><i class="fas fa-envelope"></i></a>
         <a href="https://wa.me/5574999194524"><i class="fab fa-whatsapp"></i></a>
-
       </div>
     </div>
 
     <div class="membro" style="animation-delay: 0.1s;">
-      <img src="imagem/debora2.jpg" alt="Déborah Freire" >
+      <img src="imagem/debora2.jpg" alt="Débora Freire">
       <h3>Débora Freire</h3>
       <div class="contatos">
         <a href="mailto:freiredebora937@gmail.com"><i class="fas fa-envelope"></i></a>
@@ -261,7 +272,7 @@
     </div>
 
     <div class="membro" style="animation-delay: 0.3s;">
-      <img src="imagem/sarah.jpeg" alt="Sarah Kally" >
+      <img src="imagem/sarah.jpeg" alt="Sarah Kally">
       <h3>Sarah Kally</h3>
       <div class="contatos">
         <a href="mailto:sarahkallyp@gmail.com"><i class="fas fa-envelope"></i></a>
@@ -270,7 +281,7 @@
     </div>
 
     <div class="membro" style="animation-delay: 0.4s;">
-      <img src="imagem/isabely.jpeg" alt="Isabely Santana" >
+      <img src="imagem/isabely.jpeg" alt="Isabely Santana">
       <h3>Isabely Santana</h3>
       <div class="contatos">
         <a href="mailto:isabelysantana02@gmail.com"><i class="fas fa-envelope"></i></a>
@@ -282,19 +293,34 @@
   <h2>Orientadora</h2>
   <div class="equipe">
     <div class="orientadora" style="animation-delay: 0.5s;">
-      <img src="imagens/agda.jpg" alt="Ágda Rios" data-tooltip="Guia o projeto, sugere melhorias e acompanha a equipe.">
+      <img src="imagem/agda.jpg" alt="Ágda Rios">
       <h3>Ágda Rios</h3>
       <p>Professora e Orientadora</p>
-      </div>
     </div>
   </div>
 
   <h2 id="contato">Entre em Contato</h2>
   <form action="https://formsubmit.co/20231030018@ifba.edu.br" method="POST">
-  <input type="text" name="name" placeholder="Seu Nome" required>
-  <input type="email" name="email" placeholder="Seu Email" required>
-  <textarea name="message" placeholder="Mensagem"></textarea>
-  <button type="submit">Enviar</button>
-</form>
+    <input type="text" name="name" placeholder="Seu Nome" required>
+    <input type="email" name="email" placeholder="Seu Email" required>
+    <textarea name="message" placeholder="Mensagem" rows="4"></textarea>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <footer>
+    © 2025 Recicla Jacobina | Todos os direitos reservados.
+  </footer>
+
+  <!-- VLibras -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
 </body>
 </html>

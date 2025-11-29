@@ -7,6 +7,8 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a81368914c.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     body {
@@ -18,7 +20,6 @@
       line-height: 1.6;
     }
 
-    /* Navbar */
     nav {
       display: flex;
       justify-content: center;
@@ -27,17 +28,18 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-wrap: wrap;
     }
     nav a {
       color: #fff;
       text-decoration: none;
-      margin: 0 20px;
+      margin: 8px 15px;
       font-weight: bold;
       transition: color 0.3s;
+      font-size: 1rem;
     }
     nav a:hover { color: #d4f1e1; }
 
-    /* Header */
     header {
       background: linear-gradient(90deg, #2e9f6e, #1d704b);
       color: #fff;
@@ -55,7 +57,6 @@
       font-size: 1.8rem;
     }
 
-    /* Cards das rotas */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -85,19 +86,71 @@
       margin-bottom: 15px;
       font-size: 20px;
     }
-    .card i { font-size: 24px; transition: transform 0.3s; }
-    .card:hover i { transform: rotate(20deg); }
 
-    .card p, .card ul { margin: 10px 0; }
-    .card ul li { margin-bottom: 6px; }
-
-    /* Cores diferentes por rota */
     .rota1 { border-left-color: #28a745; }
     .rota2 { border-left-color: #007bff; }
     .rota3 { border-left-color: #ffc107; }
     .rota4 { border-left-color: #fd7e14; }
 
-    /* Mapa */
+    .trilha-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 40px auto;
+    }
+    .trilha {
+      position: relative;
+      height: 60px;
+      background: linear-gradient(90deg, #dff5e8, #c4f0d8);
+      border-radius: 30px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .estrada {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      right: 30px;
+      height: 4px;
+      background: #2e9f6e;
+      transform: translateY(-50%);
+      border-radius: 2px;
+    }
+    .ponto {
+      position: absolute;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border: 3px solid #2e9f6e;
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+    .caminhao {
+      position: absolute;
+      top: 25%;
+      left: 0;
+      font-size: 22px;
+      color: #2e9f6e;
+      animation: mover 6s linear infinite;
+    }
+    @keyframes mover {
+      0% { left: 0; }
+      100% { left: calc(100% - 30px); }
+    }
+    .nomes {
+      position: absolute;
+      bottom: 5px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #1d704b;
+    }
+
     .mapa-container {
       width: 90%;
       max-width: 900px;
@@ -105,10 +158,18 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      background: #fff;
+    }
+    #pesquisa {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      border-bottom: 2px solid #2e9f6e;
     }
     .mapa { width: 100%; height: 450px; border: 0; }
 
-    /* Tabela resumida */
     table {
       width: 90%;
       max-width: 900px;
@@ -119,22 +180,10 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
-    th, td { padding: 12px 15px; font-size: 15px; }
-    th { background: #2e9f6e; color: #fff; font-size: 14px; text-transform: uppercase; }
+    th, td { padding: 12px 15px; font-size: 15px; text-align: center; }
+    th { background: #2e9f6e; color: #fff; text-transform: uppercase; }
     tr:nth-child(even) { background: #f2fdf6; }
     tr:hover { background: #dff5e8; transition: 0.3s; }
-
-    /* Legenda */
-    .legenda {
-      width: 90%;
-      max-width: 900px;
-      margin: 0 auto 40px;
-      background: #e9fdf2;
-      border-left: 6px solid #2e9f6e;
-      padding: 15px;
-      border-radius: 6px;
-      font-size: 0.95rem;
-    }
 
     footer {
       background: #1d704b;
@@ -144,6 +193,15 @@
       font-size: 14px;
     }
 
+    /* ----------- Responsividade ----------- */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.6rem; }
+      h2 { font-size: 1.4rem; }
+      nav a { margin: 5px 10px; font-size: 0.9rem; }
+      .card { padding: 15px; }
+      table { font-size: 14px; }
+      #pesquisa { font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -159,7 +217,7 @@
     <p>Confira os horários, bairros atendidos e visualize no mapa</p>
   </header>
 
-  <h2>📍 Nossas Rotas</h2>
+  <h2>🚛 Nossas Rotas</h2>
   <div class="cards">
     <div class="card rota1">
       <h3><i class="fas fa-truck"></i> Rota 01</h3>
@@ -187,64 +245,99 @@
     </div>
   </div>
 
-  <h2>🗺️ Mapa das Rotas</h2>
-  <div class="mapa-container">
-    <iframe class="mapa"
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.803639938322!2d-40.50726718533518!3d-11.180615591812477!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x71696c8b6d1b7f%3A0x7e5a3f5f98c8a9ea!2sJacobina%2C%20BA!5e0!3m2!1spt-BR!2sbr!4v1696050000000!5m2!1spt-BR!2sbr"
-      allowfullscreen=""
-      loading="lazy">
-    </iframe>
+  <h2>🛣️ Caminhos das Rotas</h2>
+  <div class="trilha-container">
+    <div class="trilha">
+      <div class="estrada"></div>
+      <div class="ponto" style="left: 30px;"></div>
+      <div class="ponto" style="left: 50%;"></div>
+      <div class="ponto" style="right: 30px;"></div>
+      <i class="fas fa-truck caminhao"></i>
+      <div class="nomes">
+        <span>Centro</span>
+        <span>São José</span>
+        <span>Félix Tomaz</span>
+      </div>
+    </div>
+
+    <div class="trilha">
+      <div class="estrada"></div>
+      <div class="ponto" style="left: 30px;"></div>
+      <div class="ponto" style="left: 50%;"></div>
+      <div class="ponto" style="right: 30px;"></div>
+      <i class="fas fa-truck caminhao"></i>
+      <div class="nomes">
+        <span>Vila Nova</span>
+        <span>Catuaba</span>
+        <span>Cazuzinha</span>
+      </div>
+    </div>
   </div>
 
-  <h2>📌 Tabela Resumida</h2>
+  <h2>🗺️ Mapa das Rotas</h2>
+  <div class="mapa-container">
+    <input id="pesquisa" type="text" placeholder="🔍 Buscar bairro ou rota...">
+    <div id="mapa" class="mapa"></div>
+  </div>
+
+  <h2>🕒 Horários e Bairros</h2>
   <table>
     <tr>
       <th>Rota</th>
-      <th>Bairros Atendidos</th>
+      <th>Bairros</th>
       <th>Dias</th>
       <th>Horário</th>
     </tr>
-    <tr>
-      <td>01</td>
-      <td>Centro, São José, Félix Tomaz</td>
-      <td>Segunda a Sexta</td>
-      <td>07:00</td>
-    </tr>
-    <tr>
-      <td>02</td>
-      <td>Vila Nova, Catuaba, Cazuzinha</td>
-      <td>Terça e Quinta</td>
-      <td>14:30</td>
-    </tr>
-    <tr>
-      <td>03</td>
-      <td>Bananeira, Peru, Jacobina II</td>
-      <td>Segunda, Quarta e Sexta</td>
-      <td>08:00</td>
-    </tr>
-    <tr>
-      <td>04</td>
-      <td>Mundo Novo, Lagoa Dourada, Mutirão</td>
-      <td>Terça e Quinta</td>
-      <td>09:00</td>
-    </tr>
+    <tr><td>Rota 01</td><td>Centro, São José, Félix Tomaz</td><td>Segunda a Sexta</td><td>07:00</td></tr>
+    <tr><td>Rota 02</td><td>Vila Nova, Catuaba, Cazuzinha</td><td>Terça e Quinta</td><td>14:30</td></tr>
+    <tr><td>Rota 03</td><td>Bananeira, Peru, Jacobina II</td><td>Segunda, Quarta e Sexta</td><td>08:00</td></tr>
+    <tr><td>Rota 04</td><td>Mundo Novo, Lagoa Dourada, Mutirão</td><td>Terça e Quinta</td><td>09:00</td></tr>
   </table>
-
-  <div class="legenda">
-    <b>Legenda:</b>
-    <ul>
-      <li><b>Rota 01:</b> Áreas centrais e comerciais.</li>
-      <li><b>Rota 02:</b> Regiões residenciais intermediárias.</li>
-      <li><b>Rota 03:</b> Bairros periféricos da cidade.</li>
-      <li><b>Rota 04:</b> Áreas de expansão e novos loteamentos.</li>
-    </ul>
-    <p><b>Observação:</b> Não coloque lixo perigoso, eletrônico ou orgânico misturado com recicláveis.</p>
-  </div>
 
   <footer>
     <p>Projeto Jacobina Caminhos Sustentáveis ♻️</p>
-    <p>&copy; 2025 - Desenvolvido pela equipe de Informatica 1813</p>
+    <p>&copy; 2025 - Desenvolvido pela equipe de Informática 1813</p>
   </footer>
+
+  <!-- VLibras - Acessibilidade em Libras -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+
+  <script>
+    const mapa = L.map('mapa').setView([-11.1806, -40.5072], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+
+    const rotas = [
+      { nome: "Rota 01", bairros: ["Centro", "São José", "Félix Tomaz"], coords: [-11.182, -40.510] },
+      { nome: "Rota 02", bairros: ["Vila Nova", "Catuaba", "Cazuzinha"], coords: [-11.185, -40.500] },
+      { nome: "Rota 03", bairros: ["Bananeira", "Peru", "Jacobina II"], coords: [-11.190, -40.520] },
+      { nome: "Rota 04", bairros: ["Mundo Novo", "Lagoa Dourada", "Mutirão"], coords: [-11.200, -40.505] },
+    ];
+
+    rotas.forEach(r => {
+      L.marker(r.coords).addTo(mapa)
+        .bindPopup(`<b>${r.nome}</b><br>${r.bairros.join(', ')}`);
+    });
+
+    document.getElementById('pesquisa').addEventListener('input', e => {
+      const termo = e.target.value.toLowerCase();
+      const resultado = rotas.find(r =>
+        r.nome.toLowerCase().includes(termo) ||
+        r.bairros.some(b => b.toLowerCase().includes(termo))
+      );
+      if (resultado) mapa.setView(resultado.coords, 15);
+    });
+  </script>
 
 </body>
 </html>
